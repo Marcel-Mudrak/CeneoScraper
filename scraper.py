@@ -1,38 +1,66 @@
+from encodings import utf_8
+from tkinter.messagebox import NO
 import requests
 from bs4 import BeautifulSoup
+import json
 
-url = 'https://www.ceneo.pl/45863470#tab=reviews'
+url = 'https://www.ceneo.pl/95870086#tab=reviews'
 
-response = requests.get(url)
+all_opinions = []
 
-page_dom = BeautifulSoup(response.text, 'html.parser')
+while(url):
+    response = requests.get(url)
+    page_dom = BeautifulSoup(response.text, 'html.parser')
+    opinions = page_dom.select('div.js_product-review')
 
-opinions = page_dom.select('div.js_product-review')
-opinion = opinions.pop(3)
+    for opinion in opinions:
 
-opinion_id = opinion['data-entry-id']
-author = opinion.select_one('span.user-post__author-name').text.strip()
-rcmd = opinion.select_one('span.user-post__author-reccomendation > em').text.strip()
-score = opinion.select_one('span.user-post__score-count').text.strip()
-content = opinion.select_one('div.user-post__text').text.strip()
+        opinion_id = opinion['data-entry-id']
+        author = opinion.select_one('span.user-post__author-name').text.strip()
 
-posted_on = opinion.select_one("span.user-post_published > time:nth-child(1)'\['datetime\]").text.strip()
-bought_on = opinion.select_one("span.user-post_published > time:nth-child(2)'\['datetime\]").text.strip()
+        try:
+            rcmd = opinion.select_one('span.user-post__author-reccomendation > em').text.strip()
+        except AttributeError:
+            rcmd = None
+            
+        score = opinion.select_one('span.user-post__score-count').text.strip()
+        content = opinion.select_one('div.user-post__text').text.strip()
 
-useful_for = opinion.select_one('button.vote-yes > span').text.strip()
-useless_for = opinion.select_one('button.vote-no > span').text.strip()
+        posted_on = opinion.select_one("span.user-post__published > time:nth-child(1)")['datetime'].strip()
+        bought_on = opinion.select_one("span.user-post__published > time:nth-child(2)")['datetime'].strip()
 
-pros = opinion.select_one('div.review-feature__title--positives ~ div.review-feature__item').text.strip()
-cons = opinion.select_one('div.review-feature__title--negatives ~ div.review-feature__item').text.strip()
+        useful_for = opinion.select_one('button.vote-yes > span').text.strip()
+        useless_for = opinion.select_one('button.vote-no > span').text.strip()
 
-pros = [item.text.strip() for item in pros]
-cons = [item.text.strip() for item in cons]
+        pros = opinion.select('div.review-feature__title--positives ~ div.review-feature__item')
+        cons = opinion.select('div.review-feature__title--negatives ~ div.review-feature__item')
 
-print(type(pros))
-print(pros)
+        pros = [item.text.strip() for item in pros]
+        cons = [item.text.strip() for item in cons]
 
+        single_opinion = {
+            'opinion_id': opinion_id,
+            'author': author,
+            'rcmd': rcmd,
+            'score': score,
+            'content': content,
+            'posted_on': posted_on,
+            'bought_on': bought_on,
+            'useful_for': useful_for,
+            'useless_for': useless_for,
+            'pros': pros,
+            'cons': cons
+        }
+        all_opinions.append(single_opinion)
+        
+    try:
+        url = 'https://www.ceneo.pl' + page_dom.select_one('a.pagination__next')['href']
+    except TypeError:
+        url = None
 
-# with open('opinie.html', 'w') as file:
-# 	file.write(opinion.prettify())
+print(json.dumps(all_opinions, indent=4, ensure_ascii=False))
 
-# print(opinion.prettify())
+with open('opinie.txt', 'w') as file:
+    for opinion in all_opinions:
+        for k, v in opinion.items():
+            file.write(str(k) + ':\n' + str(v) + '\n\n')
