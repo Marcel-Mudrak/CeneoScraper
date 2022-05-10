@@ -20,7 +20,7 @@
 # Stages of the project
 
 1) Extraction of elements for a single opinion to separate variables
-2) Extraction of elements for a single opinion 3)to one complex variable
+2) Extraction of elements for a single opinion to one complex variable
 3) Extraction of all opinions form single page to list
 4) Extraction of all opinions for certain product and saving it to file
 5) Code refactoring annd optimazation
