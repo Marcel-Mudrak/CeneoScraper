@@ -1,18 +1,27 @@
+from googletrans import Translator
 from bs4 import BeautifulSoup
 import requests
 import json
-from translate import Translator
 
-translator= Translator(to_lang="en", from_lang="pl")
+dest = "en"
+src = "pl"
+translator = Translator()
 
 def get_element(parent, selector, attribute = None, return_list = False):
     try:
         if return_list:
-            return [item.text.strip() for item in parent.select(selector)]
+            return ", ".join([item.text.strip() for item in parent.select(selector)])
         if attribute:
             return parent.select_one(selector)[attribute]
         return parent.select_one(selector).text.strip()
     except (AttributeError, TypeError):
+        return None
+
+def translate(text, src=src, dest=dest):
+    try:
+        return translator.translate(text, src=src, dest=dest).text
+    except AttributeError:
+        print("Error")
         return None
 
 opinion_elements = {
@@ -50,7 +59,9 @@ while (url):
         single_opinion['score'] = float(single_opinion['score'].split('/')[0].replace(',', '.'))
         single_opinion['useful_for'] = int(single_opinion['useful_for'])
         single_opinion['useless_for'] = int(single_opinion['useless_for'])
-        single_opinion['content_en'] = translator.translate(single_opinion['content'])
+        single_opinion["content_en"] = translate(single_opinion["content"])
+        single_opinion['pros_en'] = translate(single_opinion['pros'])
+        single_opinion['cons_en'] = translate(single_opinion['cons'])
         
         all_opinions.append(single_opinion)
         
@@ -63,6 +74,6 @@ while (url):
 with open(f'opinions/{product_id}.txt', 'w', encoding='UTF-8') as file:
     for opinion in all_opinions:
         for k, v in opinion.items():
-            file.write(str(k) + ':\n' + str(v) + '\n\n')
+            file.write(str(k) + ':\n' + str(v) + '\n------\n')
             
 # 91066177
