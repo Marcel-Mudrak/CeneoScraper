@@ -58,7 +58,7 @@ while (url):
         single_opinion['score'] = float(single_opinion['score'].split('/')[0].replace(',', '.'))
         single_opinion['useful_for'] = int(single_opinion['useful_for'])
         single_opinion['useless_for'] = int(single_opinion['useless_for'])
-        single_opinion['content_en'] = translate(single_opinion['content'])
+        single_opinion['content_en'] = translate(single_opinion['content']) if single_opinion['content'] else ''
         single_opinion['pros_en'] = translate(single_opinion['pros']) if single_opinion['pros'] else ''
         single_opinion['cons_en'] = translate(single_opinion['cons']) if single_opinion['cons'] else ''
         
