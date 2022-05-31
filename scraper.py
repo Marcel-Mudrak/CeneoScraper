@@ -20,7 +20,7 @@ def get_element(parent, selector, attribute = None, return_list = False):
 def translate(text, src=src, dest=dest):
     try:
         return translator.translate(text, src=src, dest=dest).text
-    except AttributeError:
+    except (AttributeError, TypeError):
         print("Error")
         return None
 
@@ -43,7 +43,6 @@ url = f"https://www.ceneo.pl/{product_id}#tab=reviews"
 all_opinions = []
 
 while (url):
-    print(url)
     response = requests.get(url)
     page_dom = BeautifulSoup(response.text, "html.parser")
     opinions = page_dom.select("div.js_product-review")
@@ -59,9 +58,9 @@ while (url):
         single_opinion['score'] = float(single_opinion['score'].split('/')[0].replace(',', '.'))
         single_opinion['useful_for'] = int(single_opinion['useful_for'])
         single_opinion['useless_for'] = int(single_opinion['useless_for'])
-        single_opinion["content_en"] = translate(single_opinion["content"])
-        single_opinion['pros_en'] = translate(single_opinion['pros'])
-        single_opinion['cons_en'] = translate(single_opinion['cons'])
+        single_opinion['content_en'] = translate(single_opinion['content'])
+        single_opinion['pros_en'] = translate(single_opinion['pros']) if single_opinion['pros'] else ''
+        single_opinion['cons_en'] = translate(single_opinion['cons']) if single_opinion['cons'] else ''
         
         all_opinions.append(single_opinion)
         
@@ -71,9 +70,12 @@ while (url):
         url = None
         
         
-with open(f'opinions/{product_id}.txt', 'w', encoding='UTF-8') as file:
-    for opinion in all_opinions:
-        for k, v in opinion.items():
-            file.write(str(k) + ':\n' + str(v) + '\n------\n')
+# with open(f'opinions/{product_id}.txt', 'w', encoding='UTF-8') as file:
+#     for opinion in all_opinions:
+#         for k, v in opinion.items():
+#             file.write(str(k) + ':\n' + str(v) + '\n------\n')
+
+with open(f'opinions/{product_id}.json', 'w', encoding='UTF-8') as file:
+    json.dump(all_opinions, file, indent=4, ensure_ascii=False)
             
 # 91066177
