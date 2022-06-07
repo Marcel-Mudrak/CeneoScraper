@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from matplotlib import pyplot as plt
+from numpy import arange
 
 print(*[filename.split('.')[0] for filename in os.listdir('./opinions')], sep='\n')
 
@@ -13,7 +14,7 @@ pros_count = opinions['pros'].map(bool).sum()
 cons_count = opinions['cons'].map(bool).sum()
 average_score = opinions['score'].mean().round(2)
 
-stars_recommendation = pd.crosstab(opinions['score'], opinions['rcmd'], dropna=False).sort_index().reindex([1, 2, 3, 4, 5])
+stars_recommendation = pd.crosstab(opinions['score'], opinions['rcmd'], dropna=False).sort_index().reindex(arange(1, 5.5, 0.5))
 # print(stars_recommendation)
 
 recommendations = opinions['rcmd'].value_counts(dropna=False).sort_index().reindex([False, True, None])
