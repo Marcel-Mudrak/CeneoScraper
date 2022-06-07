@@ -2,6 +2,7 @@ from googletrans import Translator
 from bs4 import BeautifulSoup
 import requests
 import json
+import os
 
 dest = "en"
 src = "pl"
@@ -69,11 +70,13 @@ while (url):
     except TypeError: 
         url = None
         
-        
 # with open(f'opinions/{product_id}.txt', 'w', encoding='UTF-8') as file:
 #     for opinion in all_opinions:
 #         for k, v in opinion.items():
 #             file.write(str(k) + ':\n' + str(v) + '\n------\n')
+
+if not os.path.isdir('plots/'):
+    os.mkdir('plots/')
 
 with open(f'opinions/{product_id}.json', 'w', encoding='UTF-8') as file:
     json.dump(all_opinions, file, indent=4, ensure_ascii=False)
