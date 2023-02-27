@@ -23,7 +23,7 @@
 2) Extraction of elements for a single opinion to one complex variable
 3) Extraction of all opinions form single page to list
 4) Extraction of all opinions for certain product and saving it to file
-5) Code refactoring annd optimazation
+5) Code refactoring annd optimization
     1) Definition of function for extracting single elements of page from HTML code
     2) Creation of dictionary that describes opinion's structure with selectors for particular opinion's elements
     3) Usinng dictionary comprehension to extract all opinion's elements on the basis of opinion's structure dictionary
